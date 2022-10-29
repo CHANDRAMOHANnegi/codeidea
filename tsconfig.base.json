@@ -15,8 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@codeidea/ui": ["libs/ui/src/index.ts"],
-      "@codeidea/customhooks": ["libs/custom-hooks/src/index.ts"]
+      "@codeidea/customhooks": ["libs/custom-hooks/src/index.ts"],
+      "@codeidea/ui": ["libs/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
