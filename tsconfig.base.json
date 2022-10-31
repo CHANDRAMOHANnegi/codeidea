@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@codeidea/customhooks": ["libs/custom-hooks/src/index.ts"],
+      "@codeidea/shared-types": ["libs/shared-types/src/index.ts"],
       "@codeidea/ui": ["libs/ui/src/index.ts"]
     }
   },
