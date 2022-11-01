@@ -1,70 +1,60 @@
-/* eslint-disable @next/next/no-img-element */
-import React, { useEffect } from "react";
-import Head from "next/head";
-import Link from "next/link";
-import styles from "../styles/Home.module.css";
+import { useEffect, useState, useCallback } from 'react';
+import React from 'react';
 
-export async function getStaticProps() {
-  const resp = await fetch(
-    "https://jherr-pokemon.s3.us-west-1.amazonaws.com/index.json"
+import { Pokemon } from '@codeidea/shared-types';
+
+import styles from './index.module.css';
+
+export function Index({
+  q,
+  pokemon: initialPokemon,
+}: {
+  q: string;
+  pokemon: Pokemon[];
+}) {
+  const [search, setSearch] = useState(q);
+  const [pokemon, setPokemon] = useState<Pokemon[]>(initialPokemon);
+
+  useEffect(() => {
+    fetch(`http://localhost:3333/search?q=${(search)}`)
+      .then((resp) => resp.json())
+      .then((data) => setPokemon(data));
+  }, [search]);
+
+  const onSetSearch = useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      setSearch(evt.target.value);
+    },
+    []
   );
+
+  return (
+    <div className={styles.page}>
+      <input value={search} onChange={onSetSearch} />
+      <ul>
+        {pokemon.map(({ id, name: { english } }) => (
+          <li key={id}>{english}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export async function getServerSideProps(context) {
+  let pokemon = [];
+  if (context.query.q) {
+    const res = await fetch(
+      `http://localhost:3333/search?q=${escape(context.query.q)}`
+    );
+    pokemon = await res.json();
+  }
 
   return {
     props: {
-      pokemon: await resp.json(),
+      q: context.query.q ?? '',
+      pokemon,
     },
   };
-}
-
-interface IPokemon {
-  "id": number,
-  "name": string,
-  "image": string
-}
-
-export function Index({ pokemon }: { pokemon: IPokemon[] }) {
-
-  useEffect(() => {
-    fetch(
-      "http://localhost:3333/search"
-    ).then(d => d.json()).then(d => {
-      console.log('res--',d);
-    }).catch(err=>{console.log(err);
-    });
-
-    // return () => {
-
-    // }
-  }, [])
-
-  /*
-   * Replace the elements below with your own.
-   *
-   * Note: The corresponding styles are in the ./index.css file.
-   */
-
-
-  return (
-    <div className={'container'}>
-      <Head>
-        <title>Pokemon List</title>
-      </Head>
-      <h2>Pokemon List</h2>
-      <div className={styles.grid}>
-        {pokemon.map((pokemon) => (
-          <div className={styles.card} key={pokemon.id}>
-            <Link href={`/pokemon/${pokemon.id}`}>
-              {/* <img
-                src={`https://jherr-pokemon.s3.us-west-1.amazonaws.com/${pokemon.image}`}
-                alt={pokemon.name}
-              /> */}
-              <h3>{pokemon.name}</h3>
-            </Link>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 }
 
 export default Index;
